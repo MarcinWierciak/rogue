@@ -1,0 +1,29 @@
+"""def moving_maze(board, x, y, player_sign):
+    direction = getch()
+    if (board[y][x] == "*"):
+        insert_player(board, x, y, " ")
+        board = add_to_inv("*",board)
+        print_board(board)
+    if direction == "d":
+        if not(board[y][x+1] == "|"): #or board[y][x+1] == "_" ):
+            insert_player(board, x, y, "_")
+            x += 1
+            insert_player(board, x, y, player_sign)
+    if direction == "a":
+        if not(board[y][x-1] == "|") :#or board[y][x-1] == "_"):
+            insert_player(board, x, y, "_")
+            x -= 1
+            insert_player(board ,x ,y, player_sign)
+    if direction == "w":
+        if not(board[y-1][x] == "|") :#or board[y-1][x] == "|"):
+            insert_player(board, x, y, "_")
+            y -= 1
+            insert_player(board ,x ,y , player_sign)
+    if direction == "s":
+        if not(board[y+1][x] == "|"):# or board[y+1][x] == "|"):
+            insert_player(board, x, y, "_")
+            y += 1
+            insert_player(board, x ,y , player_sign)
+    if direction == "x":
+        sys.exit()
+    return x, y"""
