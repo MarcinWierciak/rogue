@@ -37,7 +37,7 @@ def getch():
     return ch
 
 def hero_class_def(player_race):
-    hero_class = input("Choose your class by pressing a number: \n\n    1. Warrior  @     ||    2. Hunter  &       ||    3. Mage  \u2C07    \n: ")
+    hero_class = input("Choose your class by pressing a number: \n|  1. Warrior : @ (DMG: +3, HEALTH: +3, STR: +4, WISDOM: +1)\n|  2. Hunter : & (DMG: +4, HEALTH: +3, STR: +3, WISDOM: +1)\n|  3. Mage : \u2C07 (DMG: +2, HEALTH: +3, STR: +2, WISDOM: +4)    \n\n: ")
     if hero_class == "1":
         player_sign = player_race[:7] + "@" + player_race[7:]
     elif hero_class == "2":
@@ -49,7 +49,7 @@ def hero_class_def(player_race):
     return player_sign
 
 def hero_race_def():
-    hero_race = input("Choose your race by pressing a number: \n\n    1. \033[1;33mHuman\033[1;m     ||    2. \033[1;32mElf\033[1;m       ||    3.   \033[1;30mOrc\033[1;m    \n: ")
+    hero_race = input("Choose your race by pressing a number: \n\n|  1. \033[1;33mHuman\033[1;m (DMG: 2, HEALTH: 2, STR: 2, WISDOM: 1)   \n|  2. \033[1;32mElf\033[1;m (DMG: 1, HEALTH: 1, STR: 1, WISDOM: 4)       \n|  3. \033[1;30mOrc\033[1;m (DMG: 2, HEALTH: 3, STR: 3, WISDOM: -1)    \n\n: ")
     if hero_race == "1":
         player_race = "\033[1;33m\033[1;m"
     elif hero_race == "2":
@@ -60,7 +60,14 @@ def hero_race_def():
         sys.exit()
     return player_race
 
-
+def hero_name_and_sex_def():
+    hero_sex = input("Are you man(1) or woman(2)? ")
+    hero_name = input("What's your name? ")
+    if hero_sex == "1":
+        print("\nHello Sir " + hero_name + "!\n")
+    if hero_sex == "2":
+        print("\nHello Lady " + hero_name + "!\n")
+    return hero_sex, hero_name
 
 def insert_sign(board,x,y,player_sign):
     board[y][x] = player_sign
@@ -111,7 +118,7 @@ def read_board(filename):
             line =  "\033[1;32m"+ line + "\033[1;m"
             trees.append(line)
     board.append(trees)
-    name = "\033[1;36mThe Legend Of Zelda: Cult of Deadly Python\033[1;m:\033[1;31m ♥\033[1;m"
+    name = "\033[1;36mThe Legend Of Zelda: Cult of Deadly Python\033[1;m:" + "\033[1;31m ♥ \033[1;m"
     for i in name:
         rowtxt.append(i)
     board.append(rowtxt)
@@ -166,9 +173,12 @@ def add_lifes(board, end_time):
 
 
 
-def moving2(board, x, y, player_sign, obstacle, border, end_time, inv, added_items):
+
+
+
+def moving2(board, x, y, player_sign, obstacle, border, end_time, inv):
     #inv = {}
-    #added_items= []
+    added_items= []
     direction = getch()
     new_x = x
     new_y = y
@@ -180,21 +190,17 @@ def moving2(board, x, y, player_sign, obstacle, border, end_time, inv, added_ite
         new_y -= 1
     if direction == "s":
         new_y += 1
+    items_list = ["❀", "🍶", "💰", "🌟", "🔑"]
     new_yx = board[new_y][new_x]
     if not new_yx in border:
         if new_yx == '●':
             hot_warm()
-            #show_pop_up_hot(board, inv)
-            #added_items.append('')
-            #add_lifes(board, end_time)
-            #add_to_inventory(inv,added_items)
-            #export_inventory(inv, 'inv.csv')
-            #print_table(inv, 'count.desc')
-            #show_pop_up(board, inv)
+        #if new_yx == '🐍':
+        #    add_lifes(board, end_time, -1)
         if new_yx == obstacle:
             insert_sign(board, x, y, obstacle)
-        elif new_yx == "❀":
-            added_items.append('❀')
+        elif new_yx in items_list:
+            added_items.append(new_yx)
             add_lifes(board, end_time)
             add_to_inventory(inv,added_items)
             export_inventory(inv, 'inv.csv')
@@ -272,12 +278,57 @@ def show_pop_up_hot(board, inv):
 
 
 
+def intro_hoho():
+    intro_file = open("intro.txt", "r")
+    brief_file = open("intro1.txt", "r")
+    intro_contents = intro_file.read()
+    brief_contents = brief_file.read()
+    timecount = 920
+    timecount_1 = 330
+    start = time.time()
+
+    theme = 0
+    while theme < 3:
+        end = time.time()
+        tictic = end - start
+        if tictic >= 2:
+            print(intro_contents[(-920 + timecount):(0 + timecount)])
+            timecount = timecount + 920
+            start = time.time()
+            theme = theme + 1
+            continue
+        else:
+            continue
+
+    while theme >= 3:
+        end = time.time()
+        tictic = end - start
+        if tictic >= 2:
+            print(brief_contents[(-330 + timecount_1):(0 + timecount_1)])
+            print(theme)
+            timecount_1 = timecount_1 + 330
+            start = time.time()
+            theme = theme + 1
+            continue
+        elif theme == 18:
+            break
+        else:
+            continue
+
+
+
+
+
+
+
 
 def main():
     inv = {}
-    added_items = []
     border = ['|','_','\033[94m' + '~' + '\033[00m']
-    read_file('int_screen.txt')
+    #read_file('int_screen.txt')
+    #intro_hoho()
+
+    hero_sex, hero_name = hero_name_and_sex_def()
     player_race = hero_race_def()
     player_sign = hero_class_def(player_race)
     x= 10
@@ -285,10 +336,11 @@ def main():
     board = read_board('maps.txt')
     start_time = 0
     end_time = 0
+    #lifes = add_lifes(board, end_time, 0)
     while True:
-        x, y = moving2(board ,x ,y, player_sign, "#", border, end_time, inv, added_items)
+        x, y = moving2(board ,x ,y, player_sign, "#", border, end_time, inv)
         if board[y][x] == "^":
-            board = read_board('python.txt')
+            board = read_board('lvl3.txt')
             x = 1
             y = 2
             #show_pop_up_hot(board, inv)
@@ -302,8 +354,12 @@ def main():
             #dupa = True
             start_time = time.time()
             #timer(board, start_time)
+        elif board[y][x] == "🚪" and "🔑" in inv:
+            board = read_board('python.txt')
+            x = 1
+            y = 2
         if start_time != 0:
-            end_time = 30 - (time.time() - start_time)
+            end_time = 100 - (time.time() - start_time)
 
             #end_time = print_board(board,end_time)
             if end_time < 0:
