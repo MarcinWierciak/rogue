@@ -2,14 +2,15 @@ import os
 import sys
 import csv
 import time
-
+from hotwarm import *
 from gameInventory import *
 
 
 def print_board(board, end_time):
     if end_time != 0 :
-        end_timer = '\n',str(int(end_time))
+        end_timer = '\nTime left:',str(int(end_time))
         board[14] = end_timer
+
         #if end_time < 10:
         #    x = int(end_time)
         #    y = int(end_time)
@@ -181,6 +182,15 @@ def moving2(board, x, y, player_sign, obstacle, border, end_time, inv, added_ite
         new_y += 1
     new_yx = board[new_y][new_x]
     if not new_yx in border:
+        if new_yx == '●':
+            hot_warm()
+            #show_pop_up_hot(board, inv)
+            #added_items.append('')
+            #add_lifes(board, end_time)
+            #add_to_inventory(inv,added_items)
+            #export_inventory(inv, 'inv.csv')
+            #print_table(inv, 'count.desc')
+            #show_pop_up(board, inv)
         if new_yx == obstacle:
             insert_sign(board, x, y, obstacle)
         elif new_yx == "❀":
@@ -231,24 +241,49 @@ def show_pop_up(board, inv):
 
 
 
+def show_pop_up_hot(board, inv):
+    board_copy = []
+    for line in board:
+        board_copy.append(line[:])
+    #show_hint = choice(dictionary['0'])
+    """inv_list = []
+    for item in inv:
+        inv_list.append(str(item) + "  " + str(inv[item]))
+    lenght = max(inv_list, key = len)"""
+    pop_height, pop_width = 10, 10
+    #help_list = list(show_hint[0])"""
+
+    #for key in inv:
+
+    x_start = 25 - pop_width//2
+    x_end = x_start+pop_width+2
+    #print(inv_list)
+    for line in range(pop_height):
+        if line in [0, pop_height-1]:
+            board_copy[5][5] = ["#" for column in range(1, pop_width+3)]
+        elif line in [1, pop_height-2]:
+            board_copy[5][5] = ["#"] + [" " for column in range(2, pop_width+2)] + ["#"]
+        else:
+            board_copy[5][5] = ["#"] + [" "]*2 + input("Enter a number:") + [" "]*(pop_width - 2 + ["#"])
+
+    print_board(board_copy, 0)
+    time.sleep(5)
+    print_board(board, 0)
+
+
+
 
 def main():
     inv = {}
     added_items = []
     border = ['|','_','\033[94m' + '~' + '\033[00m']
     read_file('int_screen.txt')
-    #start_time = time.time()
-
     player_race = hero_race_def()
     player_sign = hero_class_def(player_race)
-
-    #print(round(int(end_time)))
     x= 10
     y= 10
     board = read_board('maps.txt')
-    #dupa = False
     start_time = 0
-    #lifes = add_lifes(board)
     end_time = 0
     while True:
         x, y = moving2(board ,x ,y, player_sign, "#", border, end_time, inv, added_items)
@@ -256,7 +291,11 @@ def main():
             board = read_board('python.txt')
             x = 1
             y = 2
-        elif board[y][x] == ">":
+            #show_pop_up_hot(board, inv)
+            #hot_warm()
+        elif board[y][x] == ">": #and "❀" in inv:
+            #if "❀" not in inv:
+            #    show_pop_up(board,inv)
             board = read_board('test1.txt')
             x = 1
             y = 2
@@ -264,17 +303,16 @@ def main():
             start_time = time.time()
             #timer(board, start_time)
         if start_time != 0:
-            end_time = time.time() - start_time
-        #else:
-        #    end_time = 0
-        #if int(end_time) > 30 and dupa == True:
-        #    sys.exit()
-            #start_time = time.time()
+            end_time = 30 - (time.time() - start_time)
+
+            #end_time = print_board(board,end_time)
+            if end_time < 0:
+                sys.exit()
 
         insert_sign(board, x, y, player_sign)
         os.system('clear')
         print_board(board, end_time)
-        #timer(5)
+
 
 
 
