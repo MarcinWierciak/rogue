@@ -2,7 +2,7 @@ import os
 import sys
 import csv
 import time
-from hotwarm import *
+from hotcold import *
 from gameInventory import *
 
 
@@ -138,7 +138,7 @@ def add_to_inv(board, inv):
     print_board(board, end_time)
 
 
-def print_table(inventory, order = None):
+"""def print_table(inventory, order = None):
     print("Inventory:")
 
     if order == 'count,desc':
@@ -159,7 +159,7 @@ def print_table(inventory, order = None):
         amount = 0
         for key,value in inventory.items():
             amount += int(value)
-        print("Total number of items:",amount)
+        print("Total number of items:",amount)"""
 
 
 
@@ -176,7 +176,7 @@ def add_lifes(board, end_time):
 
 
 
-def moving2(board, x, y, player_sign, obstacle, border, end_time, inv):
+def moving2(board, x, y, player_sign, obstacle, border, end_time, inv, dupa):
     #inv = {}
     added_items= []
     direction = getch()
@@ -194,9 +194,11 @@ def moving2(board, x, y, player_sign, obstacle, border, end_time, inv):
     new_yx = board[new_y][new_x]
     if not new_yx in border:
         if new_yx == '●':
-            hot_warm()
+            dupa = hot_and_cold_game()
         #if new_yx == '🐍':
         #    add_lifes(board, end_time, -1)
+        if new_yx == ' ':
+            insert_sign(board, x, y, '  ')
         if new_yx == obstacle:
             insert_sign(board, x, y, obstacle)
         elif new_yx in items_list:
@@ -214,7 +216,7 @@ def moving2(board, x, y, player_sign, obstacle, border, end_time, inv):
         y = new_y
     if direction == "x":
         sys.exit()
-    return x, y
+    return x, y, dupa
 
 
 def show_pop_up(board, inv):
@@ -325,8 +327,8 @@ def intro_hoho():
 def main():
     inv = {}
     border = ['|','_','\033[94m' + '~' + '\033[00m']
-    #read_file('int_screen.txt')
-    #intro_hoho()
+    #ead_file('int_screen.txt')
+    intro_hoho()
 
     hero_sex, hero_name = hero_name_and_sex_def()
     player_race = hero_race_def()
@@ -338,7 +340,8 @@ def main():
     end_time = 0
     #lifes = add_lifes(board, end_time, 0)
     while True:
-        x, y = moving2(board ,x ,y, player_sign, "#", border, end_time, inv)
+        dupa = False
+        x, y, dupa = moving2(board ,x ,y, player_sign, "#", border, end_time, inv, dupa)
         if board[y][x] == "^":
             board = read_board('lvl3.txt')
             x = 1
@@ -358,6 +361,9 @@ def main():
             board = read_board('python.txt')
             x = 1
             y = 2
+        if dupa == True:
+            board = read_file('level3.txt')
+            sys.exit()
         if start_time != 0:
             end_time = 100 - (time.time() - start_time)
 
