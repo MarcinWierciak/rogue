@@ -3,6 +3,8 @@ import sys
 import csv
 import time
 
+from gameInventory import *
+
 
 def print_board(board, end_time):
     if end_time != 0 :
@@ -120,12 +122,36 @@ def read_board(filename):
 
 
 
-def add_to_inventory(board, added_items):
-    inv = 0
-    inv += 1
+def add_to_inv(board, inv):
+    end_time = 0
     #board[15] = '\033[94m' + 'Gathered items:' '\033[00m'
-    board[14] += ' ❀ '*inv
-    print_board(board)
+    inv = print_table(inv, 'count.desc')
+    board[14] += inv
+    print_board(board, end_time)
+
+
+def print_table(inventory, order = None):
+    print("Inventory:")
+
+    if order == 'count,desc':
+        sorted_dict = sorted(inventory, key=inventory.get, reverse=True)
+    elif order == 'count,asc':
+        sorted_dict = sorted(inventory, key=inventory.get, reverse=False)
+    elif order == None:
+        sorted_dict = list(inventory.keys())
+
+        for item in sorted_dict:
+            lenght = len(max(inventory,key = len))
+        print("{:>{lenght}}".format("count", lenght =lenght - 4), "{:>{lenght}}".format("item name", lenght=lenght + 4))
+        print('-'*lenght*2 + '-')
+
+        for item in sorted_dict:
+            print("{:>{lenght}}".format(inventory[item], lenght = lenght - 4), "{:>{lenght}}".format(item,lenght = lenght + 4))
+
+        amount = 0
+        for key,value in inventory.items():
+            amount += int(value)
+        print("Total number of items:",amount)
 
 
 
@@ -139,7 +165,9 @@ def add_lifes(board, end_time):
 
 
 
-def moving2(board, x, y, player_sign, obstacle, border, end_time):
+def moving2(board, x, y, player_sign, obstacle, border, end_time, inv, added_items):
+    #inv = {}
+    #added_items= []
     direction = getch()
     new_x = x
     new_y = y
@@ -156,8 +184,13 @@ def moving2(board, x, y, player_sign, obstacle, border, end_time):
         if new_yx == obstacle:
             insert_sign(board, x, y, obstacle)
         elif new_yx == "❀":
+            added_items.append('❀')
             add_lifes(board, end_time)
-            add_to_inventory(board,'❀')
+            add_to_inventory(inv,added_items)
+            export_inventory(inv, 'inv.csv')
+            #print_table(inv, 'count.desc')
+            show_pop_up(board, inv)
+            #add_to_inv(board, inv)
             insert_sign(board, x, y, ".")
         else:
             insert_sign(board, x, y, ".")
@@ -168,9 +201,40 @@ def moving2(board, x, y, player_sign, obstacle, border, end_time):
     return x, y
 
 
+def show_pop_up(board, inv):
+    board_copy = []
+    for line in board:
+        board_copy.append(line[:])
+    #show_hint = choice(dictionary['0'])
+    inv_list = []
+    for item in inv:
+        inv_list.append(str(item) + "  " + str(inv[item]))
+    lenght = max(inv_list, key = len)
+    pop_height, pop_width = 4 + len(inv), len(lenght) + 4
+    #help_list = list(show_hint[0])
+
+    #for key in inv:
+
+    x_start = 25 - pop_width//2
+    x_end = x_start+pop_width+2
+    print(inv_list)
+    for line in range(pop_height):
+        if line in [0, pop_height-1]:
+            board_copy[1+line][x_start:x_end] = ["#" for column in range(1, pop_width+3)]
+        elif line in [1, pop_height-2]:
+            board_copy[1+line][x_start:x_end] = ["#"] + [" " for column in range(2, pop_width+2)] + ["#"]
+        else:
+            board_copy[1+line][x_start:x_end] = ["#"] + [" "]*2 + list(inv_list[line-3]) + [" "]*(pop_width - 2 - len(inv_list[line-3])) + ["#"]
+    print_board(board_copy, 0)
+    time.sleep(2)
+    print_board(board, 0)
+
+
 
 
 def main():
+    inv = {}
+    added_items = []
     border = ['|','_','\033[94m' + '~' + '\033[00m']
     read_file('int_screen.txt')
     #start_time = time.time()
@@ -187,7 +251,7 @@ def main():
     #lifes = add_lifes(board)
     end_time = 0
     while True:
-        x, y = moving2(board ,x ,y, player_sign, "#", border, end_time)
+        x, y = moving2(board ,x ,y, player_sign, "#", border, end_time, inv, added_items)
         if board[y][x] == "^":
             board = read_board('python.txt')
             x = 1
