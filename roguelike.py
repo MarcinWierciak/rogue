@@ -6,6 +6,45 @@ from hotwarm import *
 from gameInventory import *
 
 
+
+
+
+def moving(board, x, y, player_sign, obstacle, border):
+    direction = getch()
+    new_x = x
+    new_y = y
+    if direction == "d":
+        new_x += 1
+    if direction == "a":
+        new_x -= 1
+    if direction == "w":
+        new_y -= 1
+    if direction == "s":
+        new_y += 1
+    new_yx = board[new_y][new_x]
+    items_list = ["❀", '!']#":sake:", ":moneybag:", ":star2:", ":key:"]
+    if not new_yx in border:
+        if new_yx == obstacle:
+            insert_sign(board, x, y, obstacle)
+        elif new_yx in items_list:
+            add_lifes(board)
+            add_to_inventory(board, new_yx)
+            insert_sign(board, x, y, ".")
+        else:
+            insert_sign(board, x, y, ".")
+        x = new_x
+        y = new_y
+    if direction == "x":
+        sys.exit()
+    return x, y
+
+
+"""elif new_yx == ":key:":
+    add_lifes(board)
+    add_to_inventory(board,':key:')
+    insert_sign(board, x, y, ".")"""
+
+
 def print_board(board, end_time):
     if end_time != 0 :
         end_timer = '\nTime left:',str(int(end_time))
@@ -286,7 +325,7 @@ def main():
     start_time = 0
     end_time = 0
     while True:
-        x, y = moving2(board ,x ,y, player_sign, "#", border, end_time, inv, added_items)
+        x, y = moving(board ,x ,y, player_sign, "#", border)
         if board[y][x] == "^":
             board = read_board('python.txt')
             x = 1

@@ -16,6 +16,17 @@ def display_inventory(inventory):
 # Adds to the inventory dictionary a list of items from added_items.
 def add_to_inventory(inventory, added_items):
     for item in added_items:
+        if item == "❀":
+            item += ' flower'
+        if item == "🍶":
+            item += ' bottle'
+        if item == "💰":
+            item += ' money'
+        if item == "🌟":
+            item += ' star'
+        if item == "🔑":
+            item = "🔑"
+            print(item)
         if item in inventory:
             inventory[item] += 1
         else:
