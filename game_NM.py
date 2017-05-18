@@ -130,7 +130,7 @@ def add_to_inventory(board, added_items):
 
 
 
-def add_lifes(board):
+def add_lifes(board, end_time):
     lifes = 0
     lifes += 1
     board[13][63] += lifes*" ♥ "
@@ -139,7 +139,7 @@ def add_lifes(board):
 
 
 
-def moving2(board, x, y, player_sign, obstacle, border):
+def moving2(board, x, y, player_sign, obstacle, border, end_time):
     direction = getch()
     new_x = x
     new_y = y
@@ -156,7 +156,7 @@ def moving2(board, x, y, player_sign, obstacle, border):
         if new_yx == obstacle:
             insert_sign(board, x, y, obstacle)
         elif new_yx == "❀":
-            add_lifes(board)
+            add_lifes(board, end_time)
             add_to_inventory(board,'❀')
             insert_sign(board, x, y, ".")
         else:
@@ -185,8 +185,9 @@ def main():
     #dupa = False
     start_time = 0
     #lifes = add_lifes(board)
+    end_time = 0
     while True:
-        x, y = moving2(board ,x ,y, player_sign, "#", border)
+        x, y = moving2(board ,x ,y, player_sign, "#", border, end_time)
         if board[y][x] == "^":
             board = read_board('python.txt')
             x = 1
@@ -200,8 +201,8 @@ def main():
             #timer(board, start_time)
         if start_time != 0:
             end_time = time.time() - start_time
-        else:
-            end_time = 0
+        #else:
+        #    end_time = 0
         #if int(end_time) > 30 and dupa == True:
         #    sys.exit()
             #start_time = time.time()
