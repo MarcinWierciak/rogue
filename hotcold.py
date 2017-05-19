@@ -1,7 +1,7 @@
 from random import randint
 
 def hot_and_cold_game():
-    dupa = 0
+    game = 0
     random_number = []
     while len(random_number) != 3:
         num = randint(0, 9)
@@ -37,6 +37,6 @@ def hot_and_cold_game():
         print (*printing_result)
 
         if all(i == 'hot' for i in printing_result):
-            dupa = True
+            game = True
             break
-    return dupa
+    return game

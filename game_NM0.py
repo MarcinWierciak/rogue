@@ -1,3 +1,4 @@
+
 import os
 import sys
 import csv
@@ -122,6 +123,7 @@ def read_board(filename):
         rowtxt.append(i)
     board.append(rowtxt)
     board.append(timer)
+
     return board
 
 
@@ -136,65 +138,49 @@ def add_lifes(board, end_time):
 
 
 
-def move_player(y, x, direction, board, signs):
+def move_player(board, x, y, player_sign, obstacle, border, end_time, inv, game):
     added_items= []
+    direction = getch()
     new_x = x
     new_y = y
-    if check_sign(signs, board, x, y):
-        if direction == "d":
-            new_y += 1
-        if direction == "a":
-            new_y -= 1
-        if direction == "w":
-            new_x -= 1
-        if direction == "s":
-            new_x += 1
-        if direction == "x":
-            sys.exit()
 
-    return new_y, new_x
+    if direction == "d":
+        new_x += 1
+    if direction == "a":
+        new_x -= 1
+    if direction == "w":
+        new_y -= 1
+    if direction == "s":
+        new_y += 1
 
+    items_list = ["❀", "🍶", "💰", "🌟", "🔑"]
+    new_yx = board[new_y][new_x]
 
-def check_sign(signs, board, x, y):
-    new_yx = board[y][x]
-    if new_yx in signs[2:]:
-        return False
-        #update_board(move_or_not, board, x, y)
-    elif not new_yx in signs[2:]:
-        return True
+    if not new_yx in border:
+        if new_yx == '●':
+            game = hot_and_cold_game()
+        if new_yx == ' ':
+            insert_sign(board, x, y, '  ')
+        if new_yx == obstacle:
+            insert_sign(board, x, y, obstacle)
+        elif new_yx in items_list:
+            added_items.append(new_yx)
+            add_lifes(board, end_time)
+            add_to_inventory(inv,added_items)
+            export_inventory(inv, 'inv.csv')
+            show_pop_up(board, inv)
+            insert_sign(board, x, y, ".")
+        else:
+            insert_sign(board, x, y, ".")
+        x = new_x
+        y = new_y
 
+    if direction == "x":
+        sys.exit()
 
-
-
-def update_board(signs, board, x, y):
-    new_yx = board[y][x]
-    if new_yx == signs[1]:
-        dupa = hot_and_cold_game()
-    if new_yx == signs[0]:
-        insert_sign(board, x, y, signs[0])
-
-        insert_sign(board, x, y, ".")
-    else:
-        insert_sign(board, x, y, ".")
-    return board
-
-
-def show_inv(board, inv, direction):
-    if direction == 'i':
-        show_pop_up(board, inv)
+    return x, y, game
 
 
-def add_n_stuff(board, y, x, end_time, inv):
-
-    print(x, y)
-    print(len(board))
-    print(len(board[1]))
-    new_yx = board[x][y]
-    added_items = []
-    added_items.append(new_yx)
-    add_lifes(board, end_time)
-    add_to_inventory(inv, added_items)
-    export_inventory(inv, 'inv.csv')
 
 def show_pop_up(board, inv):
     board_copy = []
@@ -226,7 +212,7 @@ def show_pop_up(board, inv):
 
 def intro_hoho():
     intro_file = open("intro.txt", "r")
-    brief_file = open("intro1.txt", "r")
+    brief_file = open("intr.txt", "r")
     intro_contents = intro_file.read()
     brief_contents = brief_file.read()
     timecount = 920
@@ -264,48 +250,36 @@ def intro_hoho():
 
 def main():
     inv = {}
-    items_list = ["❀", "🍶", "💰", "🌟", "🔑"]
+    border = ['|','_','\033[94m' + '~' + '\033[00m']
     intro_hoho()
     hero_sex, hero_name = hero_name_and_sex_def()
     player_race = hero_race_def()
     player_sign = hero_class_def(player_race)
     x= 10
     y= 10
+    board = read_board('maps.txt')
     start_time = 0
     end_time = 0
-    signs = ['#', '●', '|', '_', '\033[94m' + '~' + '\033[00m' ]
-    board = read_board('maps.txt')
 
     while True:
-        board = update_board(signs, board, x, y)
-        direction = getch()
-        dupa = False
-        show_inv(board, inv, direction)
-        x, y = move_player(x ,y, direction, board, signs)
-
-        if board[y][x] in items_list:
-            add_n_stuff(board, x, y, end_time, inv)
-
+        game = False
+        x, y, game = move_player(board ,x ,y, player_sign, "#", border, end_time, inv, game)
         if board[y][x] == "^":
             board = read_board('lvl3.txt')
             x = 1
             y = 2
-
         elif board[y][x] == ">":
             board = read_board('test1.txt')
             x = 1
             y = 2
-
             start_time = time.time()
         elif board[y][x] == "🚪" and "🔑" in inv:
             board = read_board('python.txt')
             x = 1
             y = 2
-
-        if dupa == True:
+        if game == True:
             board = read_file('level3.txt')
             sys.exit()
-
         if start_time != 0:
             end_time = 100 - (time.time() - start_time)
 
